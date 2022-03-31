@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Assignment2.Data;
+using Assignment2.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Lab4.Data;
-using Lab4.Models;
 
-namespace Lab4.Controllers
+namespace Assignment2.Controllers
 {
     public class ClientsController : Controller
     {

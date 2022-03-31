@@ -4,7 +4,7 @@ using Assignment2.Data;
 using Assignment2.Models;
 using Assignment2.Models.ViewModels;
 
-namespace Lab4.Controllers
+namespace Assignment2.Controllers
 {
     public class BrokeragesController : Controller
     {

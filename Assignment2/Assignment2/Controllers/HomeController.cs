@@ -1,11 +1,9 @@
-﻿using Lab4.Data;
-using Lab4.Models;
-using Lab4.Models.ViewModels;
+﻿using Assignment2.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 
-namespace Lab4.Controllers
+namespace Assignment2.Controllers
 {
     public class HomeController : Controller
     {
