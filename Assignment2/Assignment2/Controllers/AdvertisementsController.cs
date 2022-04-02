@@ -7,43 +7,51 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Assignment2.Data;
 using Assignment2.Models;
+using Azure.Storage.Blobs;
+using Azure;
+using Assignment2.Models.ViewModels;
 
 namespace Assignment2.Views
 {
     public class AdvertisementsController : Controller
     {
         private readonly MarketDbContext _context;
+        private readonly BlobServiceClient _blobServiceClient;
+        private readonly string containerName = "advertisements";
 
-        public AdvertisementsController(MarketDbContext context)
+        public AdvertisementsController(MarketDbContext context, BlobServiceClient blobServiceClient)
         {
             _context = context;
+            _blobServiceClient = blobServiceClient;
         }
 
         // GET: Advertisements
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string Id)
         {
-            var marketDbContext = _context.Advertisements.Include(a => a.Brokerage);
-            return View(await marketDbContext.ToListAsync());
-        }
+            // var marketDbContext = _context.Advertisements.Include(a => a.BrokerageId.Equals(Id));
 
-        // GET: Advertisements/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
+            var viewModel = new AdsViewModel
             {
-                return NotFound();
+                Advertisements = await _context.Advertisements
+                                    .Include(a => a.Brokerage)
+                                    .AsNoTracking()
+                                    .OrderByDescending(a => a.Id)
+                                    .ToListAsync()
+            };
+
+            ViewData["BrokerageId"] = Id;
+
+            if (Id != null)
+            {
+                viewModel.Brokerage = _context.Brokerages.Where(a => a.Id.Equals(Id)).Single();
+                viewModel.Advertisements = viewModel.Advertisements.Where(ads => Id.Equals(ads.BrokerageId)).ToList();
             }
 
-            var advertisement = await _context.Advertisements
-                .Include(a => a.Brokerage)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (advertisement == null)
-            {
-                return NotFound();
-            }
-
-            return View(advertisement);
+            return View(viewModel);
         }
+
+
+
 
         // GET: Advertisements/Create
         public IActionResult Create()
@@ -53,73 +61,97 @@ namespace Assignment2.Views
         }
 
         // POST: Advertisements/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,FileName,Url,BrokerageId")] Advertisement advertisement)
+        public async Task<IActionResult> Create(IFormFile file, string Id, [Bind("Id,FileName,Url,BrokerageId")] Advertisement advertisement)
         {
-            if (ModelState.IsValid)
-            {
-                _context.Add(advertisement);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["BrokerageId"] = new SelectList(_context.Brokerages, "Id", "Id", advertisement.BrokerageId);
-            return View(advertisement);
-        }
+            //
 
-        // GET: Advertisements/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
+            /*var viewModel = new FileInputViewModel
             {
-                return NotFound();
-            }
+                BrokerageId = BrokerageId,
+                File = file,
+            };
 
-            var advertisement = await _context.Advertisements.FindAsync(id);
-            if (advertisement == null)
+            if(BrokerageId != null)
             {
-                return NotFound();
-            }
-            ViewData["BrokerageId"] = new SelectList(_context.Brokerages, "Id", "Id", advertisement.BrokerageId);
-            return View(advertisement);
-        }
+                Brokerage brokerage = await _context.Brokerages.Where(b => b.Equals(BrokerageId)).FirstOrDefaultAsync();
+                viewModel.BrokerageTitle = brokerage.Title;
+            }*/
 
-        // POST: Advertisements/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,FileName,Url,BrokerageId")] Advertisement advertisement)
-        {
-            if (id != advertisement.Id)
+            if(advertisement != null && Id != null)
             {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
+                BlobContainerClient containerClient;
+                // Create the container and return a container client object
                 try
                 {
-                    _context.Update(advertisement);
-                    await _context.SaveChangesAsync();
+                    containerClient = await _blobServiceClient.CreateBlobContainerAsync(containerName);
+                    // Give access to public
+                    containerClient.SetAccessPolicy(Azure.Storage.Blobs.Models.PublicAccessType.BlobContainer);
                 }
-                catch (DbUpdateConcurrencyException)
+                catch (RequestFailedException)
                 {
-                    if (!AdvertisementExists(advertisement.Id))
+                    containerClient = _blobServiceClient.GetBlobContainerClient(containerName);
+                }
+
+                try
+                {
+                    string randomFileName = Path.GetRandomFileName();
+                    // create the blob to hold the data
+                    var blockBlob = containerClient.GetBlobClient(randomFileName);
+
+                    //get url and file name
+                    advertisement.Url = containerClient.GetBlobClient(blockBlob.Name).Uri.AbsoluteUri;
+                    advertisement.FileName = randomFileName;
+                    advertisement.BrokerageId = Id;
+                    Brokerage brokerage = await _context.Brokerages.Where(b => b.Id.Equals(Id)).FirstOrDefaultAsync();
+                    advertisement.Brokerage = brokerage;
+
+                    //Validate model once again after everything in place
+                    ModelState.Clear();
+                    TryValidateModel(advertisement);
+
+                    if (!ModelState.IsValid)
                     {
-                        return NotFound();
+                        View("Error");
                     }
-                    else
+                    _context.Advertisements.Add(advertisement);
+                    _context.Update(brokerage);
+                    await _context.SaveChangesAsync();
+
+                    //If exist -> delete
+                    if (await blockBlob.ExistsAsync())
                     {
-                        throw;
+                        await blockBlob.DeleteAsync();
+                    }
+
+                    using (var memoryStream = new MemoryStream())
+                    {
+                        // copy the file data into memory
+                        await file.CopyToAsync(memoryStream);
+
+                        // navigate back to the beginning of the memory stream
+                        memoryStream.Position = 0;
+
+                        // send the file to the cloud
+                        await blockBlob.UploadAsync(memoryStream);
+                        memoryStream.Close();
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                catch (RequestFailedException)
+                {
+                    View("Error");
+                }
+                /*if (ModelState.IsValid)
+                    {
+                    _context.Add(advertisement);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                    }
+                    ViewData["BrokerageId"] = new SelectList(_context.Brokerages, "Id", "Id", advertisement.BrokerageId);*/
+                //return View(advertisement);
             }
-            ViewData["BrokerageId"] = new SelectList(_context.Brokerages, "Id", "Id", advertisement.BrokerageId);
-            return View(advertisement);
+            return RedirectToAction("Index");
         }
 
         // GET: Advertisements/Delete/5
