@@ -54,9 +54,10 @@ namespace Assignment2.Views
 
 
         // GET: Advertisements/Create
-        public IActionResult Create()
+        public IActionResult Create(string Id)
         {
-            ViewData["BrokerageId"] = new SelectList(_context.Brokerages, "Id", "Id");
+            //ViewData["BrokerageId"] = new SelectList(_context.Brokerages, "Id", "Id");
+            ViewData["BrokerageId"] = Id;
             return View();
         }
 
@@ -151,7 +152,8 @@ namespace Assignment2.Views
                     ViewData["BrokerageId"] = new SelectList(_context.Brokerages, "Id", "Id", advertisement.BrokerageId);*/
                 //return View(advertisement);
             }
-            return RedirectToAction("Index");
+            //return RedirectToAction("Index/"+Id);
+            return RedirectToAction("Index", new { Id = Id });
         }
 
         // GET: Advertisements/Delete/5
