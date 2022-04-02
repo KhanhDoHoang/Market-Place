@@ -1,5 +1,4 @@
-﻿@*@model IEnumerable<Assignment2.Models.Client>*@
-@model Assignment2.Models.ViewModels.BrokerageViewModel
+﻿@model Assignment2.Models.ViewModels.BrokerageViewModel
 
 
 @{
@@ -11,6 +10,13 @@
 <p>
     <a asp-action="Create">Create New</a>
 </p>
+
+
+@if(!Model.Clients.Any())
+{
+    <p>No clients are present.</p>
+}
+else {
 <table class="table">
     <thead>
         <tr>
@@ -54,28 +60,6 @@
             </tr>
         }
     </tbody>
-    
-    @*<tbody>
-        @foreach (var item in Model) {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.LastName)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.FirstName)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.BirthDate)
-                </td>
-                <td>
-                    <a asp-action="Index" asp-route-id="@item.Id">Select</a> |
-                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-                </td>
-            </tr>
-        }
-    </tbody>*@
 </table>
 
 @if (Model.Subscriptions != null)
@@ -104,4 +88,5 @@
             </tr>
         }
     </table>
+}
 }
