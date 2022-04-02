@@ -22,6 +22,32 @@ namespace Assignment2.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
+            modelBuilder.Entity("Assignment2.Models.Advertisement", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("BrokerageId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BrokerageId");
+
+                    b.ToTable("Advertisement", (string)null);
+                });
+
             modelBuilder.Entity("Assignment2.Models.Brokerage", b =>
                 {
                     b.Property<string>("Id")
@@ -81,6 +107,15 @@ namespace Assignment2.Migrations
                     b.ToTable("Subscriptions");
                 });
 
+            modelBuilder.Entity("Assignment2.Models.Advertisement", b =>
+                {
+                    b.HasOne("Assignment2.Models.Brokerage", "Brokerage")
+                        .WithMany("Ads")
+                        .HasForeignKey("BrokerageId");
+
+                    b.Navigation("Brokerage");
+                });
+
             modelBuilder.Entity("Assignment2.Models.Subscription", b =>
                 {
                     b.HasOne("Assignment2.Models.Brokerage", "Brokerage")
@@ -102,6 +137,8 @@ namespace Assignment2.Migrations
 
             modelBuilder.Entity("Assignment2.Models.Brokerage", b =>
                 {
+                    b.Navigation("Ads");
+
                     b.Navigation("Subscriptions");
                 });
 

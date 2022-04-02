@@ -5,10 +5,10 @@ namespace Assignment2.Models
 {
     public class Advertisement
     {
-        [Required]
-        [Display(Name = "Advertisement Id")]
+        //[Required]
+        //[Display(Name = "Advertisement Id")]
         //[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        //[DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int Id { get; set; }
 
         [Required]
