@@ -37,7 +37,9 @@ namespace Assignment2.Controllers
             IList<Brokerage> BrokerageList = await _context.Brokerages.ToListAsync();
 
             //viewModel.Clients = viewModel.Subscriptions.Single(x => x.BrokerageId == Id).Client;
-            if (Id > 0) {
+            if (Id.HasValue) {
+                if (!viewModel.Clients.Where(i => Id == i.Id).Any()) { throw new Exception("Invalid Client Id"); }
+                
                 IList<Subscription> Subscriptions = viewModel.Clients.Where(i => Id == i.Id).FirstOrDefault().Subscriptions;
                 Subscriptions.ToList().ForEach(subscription =>
                 {
