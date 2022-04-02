@@ -21,10 +21,9 @@ namespace Assignment2.Controllers
         }
 
         // GET: Clients
-        public async Task<IActionResult> Index(int Id)
+        public async Task<IActionResult> Index(int? Id)
         {
             //return View(await _context.Clients.ToListAsync());
-
 
             var viewModel = new BrokerageViewModel
             {
@@ -37,7 +36,6 @@ namespace Assignment2.Controllers
 
             IList<Brokerage> BrokerageList = await _context.Brokerages.ToListAsync();
 
-            ViewData["ClientId"] = Id;
             //viewModel.Clients = viewModel.Subscriptions.Single(x => x.BrokerageId == Id).Client;
             if (Id > 0) {
                 IList<Subscription> Subscriptions = viewModel.Clients.Where(i => Id == i.Id).FirstOrDefault().Subscriptions;

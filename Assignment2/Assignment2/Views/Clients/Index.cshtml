@@ -36,12 +36,7 @@ else {
     <tbody>
         @foreach (var item in Model.Clients)
         {
-            string selectedRow = "";
-            if (ViewData["ClientId"] != null && item.Id == (int) ViewData["ClientId"])
-            {
-                selectedRow = "success";
-            }
-            <tr class="@selectedRow">
+            <tr>
                 <td>
                     @Html.DisplayFor(modelItem => item.LastName)
                 </td>
