@@ -3,12 +3,14 @@
 
 @{
     ViewData["Title"] = "Index";
+    var brokerageId = ViewData["BrokerageId"];
+    //var id = Model.Brokerage.Id;
 }
 
 <h1>Index</h1>
 
 <p>
-    <a asp-action="Create" asp-route-id="@Model.Brokerage.Id">Create New</a> <br />
+    <a asp-action="Create" asp-route-id="@brokerageId">Create New</a> <br />
     <a asp-controller="Brokerages" asp-action="Index">Back To List</a>
 </p>
 

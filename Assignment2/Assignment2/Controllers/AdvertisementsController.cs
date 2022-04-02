@@ -26,7 +26,7 @@ namespace Assignment2.Views
         }
 
         // GET: Advertisements
-        public async Task<IActionResult> Index(string BrokerageId)
+        public async Task<IActionResult> Index(string Id)
         {
             // var marketDbContext = _context.Advertisements.Include(a => a.BrokerageId.Equals(Id));
 
@@ -39,41 +39,15 @@ namespace Assignment2.Views
                                     .ToListAsync()
             };
 
+            ViewData["BrokerageId"] = Id;
 
-
-            ViewData["BrokerageId"] = BrokerageId;
-
-            if (BrokerageId != null)
+            if (Id != null)
             {
-                IList<Advertisement> Ads = viewModel.Advertisements.Where(ads => ads.Brokerage.Id.Equals(BrokerageId)).ToList();
-                Brokerage brokerage = _context.Brokerages.Where(a => a.Id.Equals(BrokerageId)).ToList().FirstOrDefault();
-                viewModel.Brokerage = brokerage;
-                viewModel.Advertisements = Ads;
+                viewModel.Brokerage = _context.Brokerages.Where(a => a.Id.Equals(Id)).Single();
+                viewModel.Advertisements = viewModel.Advertisements.Where(ads => Id.Equals(ads.BrokerageId)).ToList();
             }
 
             return View(viewModel);
-
-
-            // Create a container for organizing blobs within the storage account.
-/*            BlobContainerClient containerClient;
-            try
-            {
-                containerClient = await _blobServiceClient.CreateBlobContainerAsync(containerName, Azure.Storage.Blobs.Models.PublicAccessType.BlobContainer);
-            }
-            catch (RequestFailedException e)
-            {
-                containerClient = _blobServiceClient.GetBlobContainerClient(containerName);
-            }
-
-            List<Advertisement> advertisements = new();
-
-            foreach (var blob in containerClient.GetBlobs())
-            {
-                // Blob type will be BlobClient, CloudPageBlob or BlobClientDirectory
-                // Use blob.GetType() and cast to appropriate type to gain access to properties specific to each type
-                advertisements.Add(new Advertisement { FileName = blob.Name, Url = containerClient.GetBlobClient(blob.Name).Uri.AbsoluteUri });
-            }
-            return View(advertisements);*/
         }
 
 
@@ -87,94 +61,97 @@ namespace Assignment2.Views
         }
 
         // POST: Advertisements/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(IFormFile file, string BrokerageId)
+        public async Task<IActionResult> Create(IFormFile file, string Id, [Bind("Id,FileName,Url,BrokerageId")] Advertisement advertisement)
         {
-            //[Bind("Id,FileName,Url,BrokerageId")] Advertisement advertisement
+            //
 
-            var viewModel = new AdsViewModel
+            /*var viewModel = new FileInputViewModel
             {
-                Advertisements = await _context.Advertisements
-                                    .Include(a => a.Brokerage)
-                                    .AsNoTracking()
-                                    .OrderByDescending(a => a.Id)
-                                    .ToListAsync()
+                BrokerageId = BrokerageId,
+                File = file,
             };
 
-            BlobContainerClient containerClient;
-            // Create the container and return a container client object
-            try
+            if(BrokerageId != null)
             {
-                containerClient = await _blobServiceClient.CreateBlobContainerAsync(containerName);
-                // Give access to public
-                containerClient.SetAccessPolicy(Azure.Storage.Blobs.Models.PublicAccessType.BlobContainer);
-            }
-            catch (RequestFailedException)
+                Brokerage brokerage = await _context.Brokerages.Where(b => b.Equals(BrokerageId)).FirstOrDefaultAsync();
+                viewModel.BrokerageTitle = brokerage.Title;
+            }*/
+
+            if(advertisement != null && Id != null)
             {
-                containerClient = _blobServiceClient.GetBlobContainerClient(containerName);
-            }
-
-            try
-            {
-                string randomFileName = Path.GetRandomFileName();
-                // create the blob to hold the data
-                var blockBlob = containerClient.GetBlobClient(randomFileName);
-
-                //get url and file name
-                Advertisement.Url = containerClient.GetBlobClient(blockBlob.Name).Uri.AbsoluteUri;
-                AnswerImage.FileName = randomFileName;
-
-                //Validate model once again after everything in place
-                ModelState.Clear();
-                TryValidateModel(AnswerImage);
-
-                if (!ModelState.IsValid)
+                BlobContainerClient containerClient;
+                // Create the container and return a container client object
+                try
                 {
-                    /*return Page();*/
-                    return RedirectToPage("/Error");
+                    containerClient = await _blobServiceClient.CreateBlobContainerAsync(containerName);
+                    // Give access to public
+                    containerClient.SetAccessPolicy(Azure.Storage.Blobs.Models.PublicAccessType.BlobContainer);
+                }
+                catch (RequestFailedException)
+                {
+                    containerClient = _blobServiceClient.GetBlobContainerClient(containerName);
                 }
 
-                _context.AnswerImages.Add(AnswerImage);
-                await _context.SaveChangesAsync();
-
-                //If exist -> delete
-                if (await blockBlob.ExistsAsync())
+                try
                 {
-                    await blockBlob.DeleteAsync();
-                }
+                    string randomFileName = Path.GetRandomFileName();
+                    // create the blob to hold the data
+                    var blockBlob = containerClient.GetBlobClient(randomFileName);
 
-                using (var memoryStream = new MemoryStream())
+                    //get url and file name
+                    advertisement.Url = containerClient.GetBlobClient(blockBlob.Name).Uri.AbsoluteUri;
+                    advertisement.FileName = randomFileName;
+                    advertisement.BrokerageId = Id;
+                    Brokerage brokerage = await _context.Brokerages.Where(b => b.Id.Equals(Id)).FirstOrDefaultAsync();
+                    advertisement.Brokerage = brokerage;
+
+                    //Validate model once again after everything in place
+                    ModelState.Clear();
+                    TryValidateModel(advertisement);
+
+                    if (!ModelState.IsValid)
+                    {
+                        View("Error");
+                    }
+                    _context.Advertisements.Add(advertisement);
+                    _context.Update(brokerage);
+                    await _context.SaveChangesAsync();
+
+                    //If exist -> delete
+                    if (await blockBlob.ExistsAsync())
+                    {
+                        await blockBlob.DeleteAsync();
+                    }
+
+                    using (var memoryStream = new MemoryStream())
+                    {
+                        // copy the file data into memory
+                        await file.CopyToAsync(memoryStream);
+
+                        // navigate back to the beginning of the memory stream
+                        memoryStream.Position = 0;
+
+                        // send the file to the cloud
+                        await blockBlob.UploadAsync(memoryStream);
+                        memoryStream.Close();
+                    }
+                }
+                catch (RequestFailedException)
                 {
-                    // copy the file data into memory
-                    await file.CopyToAsync(memoryStream);
-
-                    // navigate back to the beginning of the memory stream
-                    memoryStream.Position = 0;
-
-                    // send the file to the cloud
-                    await blockBlob.UploadAsync(memoryStream);
-                    memoryStream.Close();
+                    View("Error");
                 }
+                /*if (ModelState.IsValid)
+                    {
+                    _context.Add(advertisement);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                    }
+                    ViewData["BrokerageId"] = new SelectList(_context.Brokerages, "Id", "Id", advertisement.BrokerageId);*/
+                //return View(advertisement);
             }
-            catch (RequestFailedException)
-            {
-                View("Error");
-            }
-
             return RedirectToAction("Index");
-
-
-            /*if (ModelState.IsValid)
-            {
-                _context.Add(advertisement);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["BrokerageId"] = new SelectList(_context.Brokerages, "Id", "Id", advertisement.BrokerageId);
-            return View(advertisement);*/
         }
 
         // GET: Advertisements/Delete/5
