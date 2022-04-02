@@ -21,13 +21,13 @@ else {
     <thead>
         <tr>
             <th>
-                LastName
+                @Html.DisplayNameFor(modelItem => modelItem.Clients.First().LastName)
             </th>
             <th>
-                FirstName
+                @Html.DisplayNameFor(modelItem => modelItem.Clients.First().FirstName)
             </th>
             <th>
-                BirthDate
+                @Html.DisplayNameFor(modelItem => modelItem.Clients.First().BirthDate)
             </th>
             <th></th>
         </tr>
