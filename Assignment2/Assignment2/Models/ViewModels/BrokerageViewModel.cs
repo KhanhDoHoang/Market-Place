@@ -6,4 +6,7 @@
         public IEnumerable<Brokerage> Brokerages { get; set; }
         public IEnumerable<Subscription> Subscriptions { get; set; }
     }
+
+
+
 }

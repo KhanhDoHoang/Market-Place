@@ -35,5 +35,11 @@ namespace Assignment2.Models
             get;
             set;
         }
+
+        public IList<Advertisement> Ads
+        {
+            get;
+            set;
+        }
     }
 }
