@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Assignment2.Data;
 using Assignment2.Models;
+using Assignment2.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -20,9 +21,36 @@ namespace Assignment2.Controllers
         }
 
         // GET: Clients
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int Id)
         {
-            return View(await _context.Clients.ToListAsync());
+            //return View(await _context.Clients.ToListAsync());
+
+
+            var viewModel = new BrokerageViewModel
+            {
+                Clients = await _context.Clients
+                  .Include(i => i.Subscriptions)
+                  .AsNoTracking()
+                  .OrderBy(i => i.Id)
+                  .ToListAsync()
+            };
+
+            IList<Brokerage> BrokerageList = await _context.Brokerages.ToListAsync();
+
+            ViewData["ClientId"] = Id;
+            //viewModel.Clients = viewModel.Subscriptions.Single(x => x.BrokerageId == Id).Client;
+            if (Id > 0) {
+                IList<Subscription> Subscriptions = viewModel.Clients.Where(i => Id == i.Id).FirstOrDefault().Subscriptions;
+                Subscriptions.ToList().ForEach(subscription =>
+                {
+                    subscription.Brokerage = BrokerageList.ToList().Where((brokerage) => subscription.BrokerageId == brokerage.Id).Single();
+                });
+
+                viewModel.Subscriptions = Subscriptions;
+            }
+
+            return View(viewModel);
+
         }
 
         // GET: Clients/Details/5
