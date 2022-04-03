@@ -228,13 +228,10 @@ namespace Assignment2.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddSubscriptions(int clientId, string brokerageId, [Bind("Id,LastName,FirstName,BirthDate")] Client client)
+        public async Task<IActionResult> AddSubscriptions(int clientId, string brokerageId)
         {
-            if (clientId != client.Id)
-            {
-                return NotFound();
-            }
+
+            Client client = _context.Clients.Where(c => c.Id == clientId).Single();
 
             Subscription newSub = new()
             {
@@ -246,6 +243,7 @@ namespace Assignment2.Controllers
 
             Brokerage brokerage = _context.Brokerages.Where(b => b.Id == brokerageId).Single();
             brokerage.Subscriptions.Add(newSub);
+            _context.Subscriptions.Add(newSub);
 
             if (ModelState.IsValid)
             {
@@ -253,7 +251,7 @@ namespace Assignment2.Controllers
                 {
                     _context.Update(client);
                     _context.Update(brokerage);
-                    _context.Subscriptions.Add(newSub);
+                    _context.Update(newSub);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
@@ -262,7 +260,6 @@ namespace Assignment2.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            //ViewData["ClientId"] = new SelectList(_context.Clients, "Id", "FirstName");
 
             return View(client);
         }
