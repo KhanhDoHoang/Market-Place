@@ -205,15 +205,14 @@ namespace Assignment2.Controllers
             IList<BrokerageSubscriptionsViewModel> SubscriptionList = new List<BrokerageSubscriptionsViewModel>();
             BrokerageList.ToList().ForEach(brokerage =>
             {
-               Subscription isSubbed = _context.Subscriptions.Where(subscription => subscription.BrokerageId.Equals(brokerage.Id) && subscription.ClientId.Equals(id)).Single();
-                //makes sense
+               bool isSubbed = _context.Subscriptions.ToList().Any(subscription => subscription.BrokerageId.Equals(brokerage.Id) && subscription.ClientId.Equals(id));
+                
 
                 BrokerageSubscriptionsViewModel subscriptionModel = new BrokerageSubscriptionsViewModel
                 {
                     BrokerageId = brokerage.Id, 
                     Title = brokerage.Title,
-                    //IsMember = _context.Subscriptions.FindAsync(subscriptions.ClientId)
-                    IsMember = id.Equals(isSubbed.ClientId),
+                    IsMember = isSubbed
                 };
                 
                 //add to subscriptionList
