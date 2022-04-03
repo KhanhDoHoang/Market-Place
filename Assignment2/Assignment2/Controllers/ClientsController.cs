@@ -181,15 +181,13 @@ namespace Assignment2.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // GET: Clients/Edit/5
+        // GET: Clients/EditSubscriptions/5
         public async Task<IActionResult> EditSubscriptions(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
-
-            //ViewData["ClientId"] = id;
 
             var viewModel = new ClientSubscriptionsViewModel
             {
@@ -201,36 +199,28 @@ namespace Assignment2.Controllers
                 return NotFound();
             }
 
+            //list of brokerages 
             IList<Brokerage> BrokerageList = await _context.Brokerages.ToListAsync(); //list of brokerages 
-           
             //model view list of all brokerages (check IsMember)
             IList<BrokerageSubscriptionsViewModel> SubscriptionList = new List<BrokerageSubscriptionsViewModel>();
-
-            //registered subscription
-            //IList<Subscription> RegisteredSubscriptionList = await _context.Subscriptions.Where(subscription => id.Equals(subscription.ClientId)).ToListAsync();
-            //registered subscriptions
-            IList<Subscription> RegisteredSubscriptions = viewModel.Client.Subscriptions;
-            RegisteredSubscriptions.ToList().ForEach(subscription => 
-                subscription.Brokerage = BrokerageList.ToList().Where((brokerage) => subscription.BrokerageId == brokerage.Id).Single()
-            );
-
-
             BrokerageList.ToList().ForEach(brokerage =>
             {
-                BrokerageSubscriptionsViewModel subscriptionModel = new BrokerageSubscriptionsViewModel();
-                Subscription subscription = brokerage.Subscriptions.Where(subscription => subscription.BrokerageId.Equals(brokerage.Id)).Single();
-                if (id.Equals(subscription.ClientId)) //clientId == subscriptionId
-                {
+               Subscription isSubbed = _context.Subscriptions.Where(subscription => subscription.BrokerageId.Equals(brokerage.Id) && subscription.ClientId.Equals(id)).Single();
+                //makes sense
 
-                } else
+                BrokerageSubscriptionsViewModel subscriptionModel = new BrokerageSubscriptionsViewModel
                 {
-
-                }
+                    BrokerageId = brokerage.Id, 
+                    Title = brokerage.Title,
+                    //IsMember = _context.Subscriptions.FindAsync(subscriptions.ClientId)
+                    IsMember = id.Equals(isSubbed.ClientId),
+                };
+                
                 //add to subscriptionList
-                SubscriptionList.Add(subscription);
-
+                SubscriptionList.Add(subscriptionModel);
             });
-            //ViewData["ClientId"] = new SelectList(_context.Clients, "Id", "FirstName");
+
+            viewModel.Subscriptions = SubscriptionList;
 
             return View(viewModel);
         }
@@ -242,7 +232,7 @@ namespace Assignment2.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddSubscriptions(int clientId, string brokerageId, [Bind("Id,LastName,FirstName,BirthDate")] Client client)
         {
-            if (id != client.Id)
+            /*if (id != client.Id)
             {
                 return NotFound();
             }
@@ -267,7 +257,7 @@ namespace Assignment2.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ClientId"] = new SelectList(_context.Clients, "Id", "FirstName");
+            ViewData["ClientId"] = new SelectList(_context.Clients, "Id", "FirstName");*/
 
             return View(client);
         }
@@ -279,7 +269,7 @@ namespace Assignment2.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> RemoveSubscriptions(int clientId, string brokerageId, [Bind("Id,LastName,FirstName,BirthDate")] Client client)
         {
-            if (id != client.Id)
+            /*if (id != client.Id)
             {
                 return NotFound();
             }
@@ -305,13 +295,9 @@ namespace Assignment2.Controllers
                 return RedirectToAction(nameof(Index));
             }
             ViewData["ClientId"] = new SelectList(_context.Clients, "Id", "FirstName");
-
+*/
             return View(client);
         }
-
-        //todo: enable user to register/unregister clients to brokerages
-        //which is basically calling the subscription based on clientId and remove the id of that brokerages
-        //three action controls are listing(get many)/remove/add
 
         private bool ClientExists(int id)
         {
