@@ -8,8 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using Assignment2.Data;
 using Assignment2.Models;
 using Azure.Storage.Blobs;
-using Azure;
 using Assignment2.Models.ViewModels;
+using Azure;
 
 namespace Assignment2.Views
 {
