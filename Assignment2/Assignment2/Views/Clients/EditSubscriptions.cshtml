@@ -2,7 +2,6 @@
 
 @{
     ViewData["Title"] = "Edit Subsciptions";
-    var clientId = ViewData["ClientId"];
 }
 
 <h1>Edit Subscriptions</h1>
@@ -29,9 +28,9 @@
                 </td>
                 <td>
                     @if(!@item.IsMember){
-                        <a asp-action="AddSubscriptions" asp-route-brokerageId="@item.BrokerageId" asp-route-clientId="@clientId">Register</a>
+                        <a asp-action="AddSubscriptions" asp-route-brokerageId="@item.BrokerageId" asp-route-clientId="@Model.Client.Id">Register</a>
                     } else {
-                        <a asp-action="RemoveSubscriptions" asp-route-brokerageId="@item.BrokerageId" asp-route-clientId="@clientId">Unregister</a>
+                        <a asp-action="RemoveSubscriptions" asp-route-brokerageId="@item.BrokerageId" asp-route-clientId="@Model.Client.Id">Unregister</a>
                     }
                 </td>
             </tr>

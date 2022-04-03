@@ -231,32 +231,33 @@ namespace Assignment2.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddSubscriptions(int clientId, string brokerageId, [Bind("Id,LastName,FirstName,BirthDate")] Client client)
         {
-            /*if (id != client.Id)
+            if (clientId != client.Id)
             {
                 return NotFound();
             }
+
+            Subscription newSub = new()
+            {
+                ClientId = clientId,
+                BrokerageId = brokerageId
+            };
 
             if (ModelState.IsValid)
             {
                 try
                 {
-                    _context.Update(client);
+                    _context.Update(newSub);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ClientExists(client.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
+
                         throw;
-                    }
+                    
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ClientId"] = new SelectList(_context.Clients, "Id", "FirstName");*/
+            //ViewData["ClientId"] = new SelectList(_context.Clients, "Id", "FirstName");
 
             return View(client);
         }
@@ -268,7 +269,7 @@ namespace Assignment2.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> RemoveSubscriptions(int clientId, string brokerageId, [Bind("Id,LastName,FirstName,BirthDate")] Client client)
         {
-            /*if (id != client.Id)
+            if (clientId != client.Id)
             {
                 return NotFound();
             }
@@ -294,7 +295,7 @@ namespace Assignment2.Controllers
                 return RedirectToAction(nameof(Index));
             }
             ViewData["ClientId"] = new SelectList(_context.Clients, "Id", "FirstName");
-*/
+
             return View(client);
         }
 
