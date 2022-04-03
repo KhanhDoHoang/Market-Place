@@ -161,9 +161,21 @@ namespace Assignment2.Controllers
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
             var brokerage = await _context.Brokerages.FindAsync(id);
-            _context.Brokerages.Remove(brokerage);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+
+            if (id != null)
+            {
+                IList<Advertisement> ads = await _context.Advertisements.ToListAsync();
+                ads = ads.Where(ads => id.Equals(ads.BrokerageId)).ToList();
+                if (!ads.Any())
+                {
+                    _context.Brokerages.Remove(brokerage);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
+
+            }
+
+            return View("Error");
         }
 
         private bool BrokerageExists(string id)
