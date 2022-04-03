@@ -242,18 +242,23 @@ namespace Assignment2.Controllers
                 BrokerageId = brokerageId
             };
 
+            client.Subscriptions.Add(newSub);
+
+            Brokerage brokerage = _context.Brokerages.Where(b => b.Id == brokerageId).Single();
+            brokerage.Subscriptions.Add(newSub);
+
             if (ModelState.IsValid)
             {
                 try
                 {
-                    _context.Update(newSub);
+                    _context.Update(client);
+                    _context.Update(brokerage);
+                    _context.Subscriptions.Add(newSub);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-
                         throw;
-                    
                 }
                 return RedirectToAction(nameof(Index));
             }
