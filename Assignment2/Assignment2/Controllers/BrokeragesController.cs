@@ -145,14 +145,18 @@ namespace Assignment2.Controllers
                 return NotFound();
             }
 
-            var brokerage = await _context.Brokerages
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (brokerage == null)
+            AdsViewModel vModel = new AdsViewModel
+            {
+                Brokerage = await _context.Brokerages.Where(b => b.Id == id).FirstOrDefaultAsync(),
+                Advertisements = await _context.Advertisements.Where(a => a.BrokerageId == id).ToListAsync()
+            };
+
+            if (vModel.Brokerage == null)
             {
                 return NotFound();
             }
 
-            return View(brokerage);
+            return View(vModel);
         }
 
         // POST: Brokerages/Delete/5
