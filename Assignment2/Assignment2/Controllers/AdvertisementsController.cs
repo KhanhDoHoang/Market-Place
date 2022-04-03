@@ -28,8 +28,6 @@ namespace Assignment2.Views
         // GET: Advertisements
         public async Task<IActionResult> Index(string Id)
         {
-            // var marketDbContext = _context.Advertisements.Include(a => a.BrokerageId.Equals(Id));
-
             var viewModel = new AdsViewModel
             {
                 Advertisements = await _context.Advertisements
@@ -56,7 +54,6 @@ namespace Assignment2.Views
         // GET: Advertisements/Create
         public IActionResult Create(string Id)
         {
-            //ViewData["BrokerageId"] = new SelectList(_context.Brokerages, "Id", "Id");
             ViewData["BrokerageId"] = Id;
             return View();
         }
@@ -66,20 +63,6 @@ namespace Assignment2.Views
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(IFormFile file, string Id, [Bind("Id,FileName,Url,BrokerageId")] Advertisement advertisement)
         {
-            //
-
-            /*var viewModel = new FileInputViewModel
-            {
-                BrokerageId = BrokerageId,
-                File = file,
-            };
-
-            if(BrokerageId != null)
-            {
-                Brokerage brokerage = await _context.Brokerages.Where(b => b.Equals(BrokerageId)).FirstOrDefaultAsync();
-                viewModel.BrokerageTitle = brokerage.Title;
-            }*/
-
             if(advertisement != null && Id != null)
             {
                 BlobContainerClient containerClient;
@@ -114,7 +97,7 @@ namespace Assignment2.Views
 
                     if (!ModelState.IsValid)
                     {
-                        View("Error");
+                        return View("Error");
                     }
                     _context.Advertisements.Add(advertisement);
                     _context.Update(brokerage);
@@ -141,18 +124,9 @@ namespace Assignment2.Views
                 }
                 catch (RequestFailedException)
                 {
-                    View("Error");
+                    return View("Error");
                 }
-                /*if (ModelState.IsValid)
-                    {
-                    _context.Add(advertisement);
-                    await _context.SaveChangesAsync();
-                    return RedirectToAction(nameof(Index));
-                    }
-                    ViewData["BrokerageId"] = new SelectList(_context.Brokerages, "Id", "Id", advertisement.BrokerageId);*/
-                //return View(advertisement);
             }
-            //return RedirectToAction("Index/"+Id);
             return RedirectToAction("Index", new { Id = Id });
         }
 
@@ -171,6 +145,7 @@ namespace Assignment2.Views
             {
                 return NotFound();
             }
+            ViewData["BrokerageId"] = advertisement.BrokerageId;
 
             return View(advertisement);
         }
@@ -181,9 +156,48 @@ namespace Assignment2.Views
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var advertisement = await _context.Advertisements.FindAsync(id);
-            _context.Advertisements.Remove(advertisement);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            string brokerageId = advertisement.BrokerageId;
+            BlobContainerClient containerClient;
+            // Get the container and return a container client object
+            try
+            {
+                containerClient = _blobServiceClient.GetBlobContainerClient(containerName);
+            }
+            catch (RequestFailedException)
+            {
+                return View("Error");
+            }
+
+            //Finding a right blob and remove it
+            foreach (var blob in containerClient.GetBlobs())
+            {
+                try
+                {
+                    // Get the blob that holds the data
+                    if (blob.Name == advertisement.FileName)
+                    {
+                        var blockBlob = containerClient.GetBlobClient(blob.Name);
+                        if (await blockBlob.ExistsAsync())
+                        {
+                            await blockBlob.DeleteAsync();
+                        }
+                    }
+                }
+                catch (RequestFailedException)
+                {
+                    return View("Error");
+                }
+            }
+
+
+            //Remove from database
+            if (advertisement != null)
+            {
+                _context.Advertisements.Remove(advertisement);
+                await _context.SaveChangesAsync();
+            }
+
+            return RedirectToAction("Index", new { Id = brokerageId });
         }
 
         private bool AdvertisementExists(int id)
