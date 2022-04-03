@@ -28,7 +28,7 @@
                    @item.Title
                 </td>
                 <td>
-                    if(@item.IsMember){
+                    @if(!@item.IsMember){
                         <a asp-action="AddSubscriptions" asp-route-brokerageId="@item.BrokerageId" asp-route-clientId="@clientId">Register</a>
                     } else {
                         <a asp-action="RemoveSubscriptions" asp-route-brokerageId="@item.BrokerageId" asp-route-clientId="@clientId">Unregister</a>
