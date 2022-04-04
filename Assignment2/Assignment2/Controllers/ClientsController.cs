@@ -224,35 +224,30 @@ namespace Assignment2.Controllers
             return View(viewModel);
         }
 
-        // POST: Clients/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        /*[HttpGet]
-        [ValidateAntiForgeryToken]*/
+        // GET: Clients/EditSubscriptions/5 (Add)
         public async Task<IActionResult> AddSubscriptions(int clientId, string brokerageId)
         {
 
             Client client = _context.Clients.Where(c => c.Id == clientId).Single();
+            Brokerage brokerage = _context.Brokerages.Where(c => c.Id == brokerageId).Single();
+            if(client == null || brokerage == null)
+            {
+                return View("Error");   
+            }
 
             Subscription newSub = new()
             {
                 ClientId = clientId,
-                BrokerageId = brokerageId
+                BrokerageId = brokerageId,
+                Client = client,
+                Brokerage = brokerage,
             };
-
-            client.Subscriptions.Add(newSub);
-
-            Brokerage brokerage = _context.Brokerages.Where(b => b.Id == brokerageId).Single();
-            brokerage.Subscriptions.Add(newSub);
-            _context.Subscriptions.Add(newSub);
-
+         
             if (ModelState.IsValid)
             {
                 try
                 {
-                    _context.Update(client);
-                    _context.Update(brokerage);
-                    _context.Update(newSub);
+                    _context.Add(newSub);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
@@ -263,11 +258,7 @@ namespace Assignment2.Controllers
             return RedirectToAction("EditSubscriptions", new { Id = clientId });
         }
 
-        // POST: Clients/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        /*[HttpPost]
-        [ValidateAntiForgeryToken]*/
+        // GET: Clients/EditSubscriptions/5 (Delete)
         public async Task<IActionResult> RemoveSubscriptions(int clientId, string brokerageId)
         {
             var removedSub = await _context.Subscriptions.Where(sub => brokerageId.Equals(sub.BrokerageId) && sub.ClientId == clientId).SingleOrDefaultAsync();
