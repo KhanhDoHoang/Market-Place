@@ -28,9 +28,9 @@
                 </td>
                 <td>
                     @if(!@item.IsMember){
-                        <a asp-action="AddSubscriptions" asp-route-clientId="@Model.Client.Id" asp-route-brokerageId="@item.BrokerageId" >Register</a>
+                        <a method="post" asp-controller="Clients" asp-action="AddSubscriptions" asp-route-clientId="@Model.Client.Id" asp-route-brokerageId="@item.BrokerageId" >Register</a>
                     } else {
-                        <a asp-action="RemoveSubscriptions" asp-route-clientId="@Model.Client.Id" asp-route-brokerageId="@item.BrokerageId">Unregister</a>
+                        <a asp-controller="Clients" asp-action="RemoveSubscriptions" asp-route-clientId="@Model.Client.Id" asp-route-brokerageId="@item.BrokerageId">Unregister</a>
                     }
                 </td>
             </tr>

@@ -227,7 +227,8 @@ namespace Assignment2.Controllers
         // POST: Clients/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
+        /*[HttpGet]
+        [ValidateAntiForgeryToken]*/
         public async Task<IActionResult> AddSubscriptions(int clientId, string brokerageId)
         {
 
@@ -256,49 +257,40 @@ namespace Assignment2.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                        throw;
+                    return View("Error");
                 }
-                return RedirectToAction(nameof(Index));
             }
-
-            return View(client);
+            return RedirectToAction("EditSubscriptions", new { Id = clientId });
         }
 
         // POST: Clients/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> RemoveSubscriptions(int clientId, string brokerageId, [Bind("Id,LastName,FirstName,BirthDate")] Client client)
+        /*[HttpPost]
+        [ValidateAntiForgeryToken]*/
+        public async Task<IActionResult> RemoveSubscriptions(int clientId, string brokerageId)
         {
-            if (clientId != client.Id)
+            var removedSub = await _context.Subscriptions.Where(sub => brokerageId.Equals(sub.BrokerageId) && sub.ClientId == clientId).SingleOrDefaultAsync();
+
+            if (removedSub == null)
             {
-                return NotFound();
+                return View("Error");
             }
 
             if (ModelState.IsValid)
             {
                 try
                 {
-                    _context.Update(client);
+                    _context.Subscriptions.Remove(removedSub);
+
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ClientExists(client.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    return View("Error");
                 }
-                return RedirectToAction(nameof(Index));
             }
-            ViewData["ClientId"] = new SelectList(_context.Clients, "Id", "FirstName");
-
-            return View(client);
+            return RedirectToAction("EditSubscriptions", new { Id = clientId });
         }
 
         private bool ClientExists(int id)
