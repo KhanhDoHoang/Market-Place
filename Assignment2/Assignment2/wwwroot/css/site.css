@@ -14,7 +14,6 @@ a.navbar-brand {
 a {
     /* color: #0366d6;*/
     font-family: "Bungee", cursive;
-    font-size: 1.5em;
     text-decoration: none;
     text-transform: uppercase;
     font-weight: 500;
@@ -92,7 +91,7 @@ body {
     position: relative;
     min-height: 100vh;
     min-width: 100vh;
-    overflow: hidden;
+    
     background-color: #fafafa;
     font-family: 'Inconsolata', monospace;
     font-weight: 700;
@@ -117,7 +116,7 @@ body {
 
 .page_404 {
     padding: 40px 0;
-    background: #fff;
+    /*background: #fff;*/
     font-family: 'Arvo', serif;
 }
 
@@ -242,19 +241,18 @@ body {
 
 .forbidden {
     position: absolute;
-    perspective: 844px;
-    width: 100%;
-    font-size: 200px;
+    perspective: 900px;
+    font-size: 80px;
     margin: auto 0;
-    left: 60%;
-    bottom: -1px;
+    left: 50%;
+    bottom: 100px;
     letter-spacing: -10px;
     color: #ccc;
     transform: translateX(-50%);
 }
     .forbidden .text
     {
-        transform: rotateX(60deg) rotateY(0deg);
+        transform: rotateX(40deg) rotateY(0deg);
     }
 
 
@@ -267,7 +265,7 @@ body {
     left: 54%;
     transform-origin: 0;
     transform: scale(.2, .2) translateX(-50%) rotate(-3deg);
-    top: 50px;
+    top: 500px;
     letter-spacing: -60px;
     line-height: .7;
     transition: all .3s cubic-bezier(0.165, 0.84, 0.44, 1);
@@ -500,8 +498,8 @@ body {
     border-radius: 45%;
     z-index: 4;
     position: absolute;
-    left: -80px;
-    top: 30px;
+    left: 80px;
+    /*top: 30px;*/
     padding: 10px;
 }
 
@@ -853,11 +851,11 @@ body {
     }
 
     12% {
-        transform: scale(1.1, 1.1) translateX(-50%) rotate(-3deg);
+        transform: scale(.4, .4) translateX(-50%) rotate(-3deg);
     }
 
     18% {
-        transform: scale(1.1, 1.1) translateX(-50%) rotate(-3deg);
+        transform: scale(.4, .4) translateX(-50%) rotate(-3deg);
     }
 
     20% {
@@ -869,11 +867,11 @@ body {
     }
 
     26% {
-        transform: scale(1.05, 1.05) translateX(-50%) rotate(3deg);
+        transform: scale(.3, .3) translateX(-50%) rotate(3deg);
     }
 
     28% {
-        transform: scale(1.05, 1.05) translateX(-50%) rotate(3deg);
+        transform: scale(.3, .3) translateX(-50%) rotate(3deg);
     }
 
     30% {
@@ -885,11 +883,11 @@ body {
     }
 
     82% {
-        transform: scale(1.13, 1.13) translateX(-50%) rotate(-6deg);
+        transform: scale(.6, .6) translateX(-50%) rotate(-6deg);
     }
 
     84% {
-        transform: scale(1.13, 1.13) translateX(-50%) rotate(-6deg);
+        transform: scale(.6, .6) translateX(-50%) rotate(-6deg);
     }
 
     86% {
