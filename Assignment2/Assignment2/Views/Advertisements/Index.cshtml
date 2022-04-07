@@ -10,9 +10,7 @@
 <h1>Index for Brokerage @Html.DisplayFor(modelItem => modelItem.Brokerage.Title)</h1>
 
 <p>
-    <a asp-action="Create" asp-route-id="@brokerageId">
-        Create New
-    </a> <br />
+    <a asp-action="Create" asp-route-id="@brokerageId" asp-route-brokerageTitle="@Model.Brokerage.Title">Create New</a> <br />
     <a asp-controller="Brokerages" asp-action="Index">Back To List</a>
 </p>
 

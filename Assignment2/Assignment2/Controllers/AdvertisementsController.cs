@@ -52,9 +52,10 @@ namespace Assignment2.Views
 
 
         // GET: Advertisements/Create
-        public IActionResult Create(string Id)
+        public IActionResult Create(string Id, string BrokerageTitle)
         {
             ViewData["BrokerageId"] = Id;
+            ViewData["brokerageTitle"] = BrokerageTitle;
             return View();
         }
 
