@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Assignment2.Migrations
 {
     [DbContext(typeof(MarketDbContext))]
-    [Migration("20220331134416_Initial")]
-    partial class Initial
+    [Migration("20220402222109_A2Init")]
+    partial class A2Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

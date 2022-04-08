@@ -1,45 +1,31 @@
-﻿@model Assignment2.Models.Advertisement
+﻿@model Assignment2.Models.Brokerage
 
 @{
     ViewData["Title"] = "Create";
 }
 
-<h1>Create</h1>
+<h1>Upload for Brokerage @Model.Title</h1>
 
 <h4>Advertisement</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <form asp-action="Create" enctype="multipart/form-data">
             <div class="form-group">
-                <label asp-for="Id" class="control-label"></label>
-                <input asp-for="Id" class="form-control" />
-                <span asp-validation-for="Id" class="text-danger"></span>
+                <div class="btn btn-sm float-left">
+                    <input name="file" type="file">
+                </div>
             </div>
+
             <div class="form-group">
-                <label asp-for="FileName" class="control-label"></label>
-                <input asp-for="FileName" class="form-control" />
-                <span asp-validation-for="FileName" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Url" class="control-label"></label>
-                <input asp-for="Url" class="form-control" />
-                <span asp-validation-for="Url" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="BrokerageId" class="control-label"></label>
-                <select asp-for="BrokerageId" class ="form-control" asp-items="ViewBag.BrokerageId"></select>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+                <button name="upload" class="btn btn-primary">Upload Now</button>
             </div>
         </form>
     </div>
 </div>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Index" asp-route-id="@Model.Id">Back to List</a>
 </div>
 
 @section Scripts {

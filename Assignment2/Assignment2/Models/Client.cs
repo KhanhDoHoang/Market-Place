@@ -10,7 +10,7 @@ namespace Assignment2.Models
             get;
             set;
         }
-
+        
         [Required]
         [StringLength(50)]
         [Display(Name = "Last Name")]
