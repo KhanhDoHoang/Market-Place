@@ -50,7 +50,7 @@ namespace Assignment2.Views
         // GET: Advertisements/Create
         public IActionResult Create(string Id)
         {
-            Brokerage viewModel = _context.Brokerages.Where(b => b.Id==Id).AsNoTracking().FirstOrDefault();
+            Brokerage viewModel = _context.Brokerages.Where(b => b.Id == Id).AsNoTracking().FirstOrDefault();
             if (viewModel == null) { return NotFound(); }
             return View(viewModel);
         }
@@ -60,10 +60,11 @@ namespace Assignment2.Views
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(IFormFile file, string Id, [Bind("Id,FileName,Url,BrokerageId")] Advertisement advertisement)
         {
-            if (file == null){
+            if (file == null)
+            {
                 return View("Error");
             }
-            if(advertisement != null && Id != null)
+            if (advertisement != null && Id != null)
             {
                 BlobContainerClient containerClient;
                 // Create the container and return a container client object
@@ -155,6 +156,8 @@ namespace Assignment2.Views
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var advertisement = await _context.Advertisements.FindAsync(id);
+            if (advertisement == null) { return NotFound(); }
+
             string brokerageId = advertisement.BrokerageId;
             BlobContainerClient containerClient;
             // Get the container and return a container client object
@@ -189,11 +192,8 @@ namespace Assignment2.Views
             }
 
             //Remove from database
-            if (advertisement != null)
-            {
-                _context.Advertisements.Remove(advertisement);
-                await _context.SaveChangesAsync();
-            }
+            _context.Advertisements.Remove(advertisement);
+            await _context.SaveChangesAsync();
 
             return RedirectToAction("Index", new { Id = brokerageId });
         }
