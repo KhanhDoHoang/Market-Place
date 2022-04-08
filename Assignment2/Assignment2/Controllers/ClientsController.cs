@@ -181,10 +181,107 @@ namespace Assignment2.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        // GET: Clients/EditSubscriptions/5
+        public async Task<IActionResult> EditSubscriptions(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
 
-        //todo: enable user to register/unregister clients to brokerages
-        //which is basically calling the subscription based on clientId and remove the id of that brokerages
-        //three action controls are listing(get many)/remove/add
+            var viewModel = new ClientSubscriptionsViewModel
+            {
+                Client = await _context.Clients.FindAsync(id),
+            };
+
+            if (viewModel.Client == null)
+            {
+                return NotFound();
+            }
+
+            //list of brokerages 
+            IList<Brokerage> BrokerageList = await _context.Brokerages.ToListAsync(); //list of brokerages 
+            //model view list of all brokerages (check IsMember)
+            IList<BrokerageSubscriptionsViewModel> SubscriptionList = new List<BrokerageSubscriptionsViewModel>();
+            BrokerageList.ToList().ForEach(brokerage =>
+            {
+               bool isSubbed = _context.Subscriptions.ToList().Any(subscription => subscription.BrokerageId.Equals(brokerage.Id) && subscription.ClientId.Equals(id));
+                
+                BrokerageSubscriptionsViewModel subscriptionModel = new BrokerageSubscriptionsViewModel
+                {
+                    BrokerageId = brokerage.Id, 
+                    Title = brokerage.Title,
+                    IsMember = isSubbed
+                };
+                
+                //add to subscriptionList
+                SubscriptionList.Add(subscriptionModel);
+            });
+
+            viewModel.Subscriptions = SubscriptionList.OrderBy(s => !s.IsMember).ThenBy(s => s.Title);
+
+            return View(viewModel);
+        }
+
+        // GET: Clients/EditSubscriptions/5 (Add)
+        public async Task<IActionResult> AddSubscriptions(int clientId, string brokerageId)
+        {
+
+            Client client = _context.Clients.Where(c => c.Id == clientId).Single();
+            Brokerage brokerage = _context.Brokerages.Where(c => c.Id == brokerageId).Single();
+            if(client == null || brokerage == null)
+            {
+                return View("Error");   
+            }
+
+            Subscription newSub = new()
+            {
+                ClientId = clientId,
+                BrokerageId = brokerageId,
+                Client = client,
+                Brokerage = brokerage,
+            };
+         
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    _context.Add(newSub);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    return View("Error");
+                }
+            }
+            return RedirectToAction("EditSubscriptions", new { Id = clientId });
+        }
+
+        // GET: Clients/EditSubscriptions/5 (Delete)
+        public async Task<IActionResult> RemoveSubscriptions(int clientId, string brokerageId)
+        {
+            var removedSub = await _context.Subscriptions.Where(sub => brokerageId.Equals(sub.BrokerageId) && sub.ClientId == clientId).SingleOrDefaultAsync();
+
+            if (removedSub == null)
+            {
+                return View("Error");
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    _context.Subscriptions.Remove(removedSub);
+
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    return View("Error");
+                }
+            }
+            return RedirectToAction("EditSubscriptions", new { Id = clientId });
+        }
 
         private bool ClientExists(int id)
         {
