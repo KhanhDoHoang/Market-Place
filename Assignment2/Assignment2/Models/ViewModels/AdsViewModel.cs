@@ -6,5 +6,4 @@
         public IEnumerable<Advertisement> Advertisements { get; set; }
     }
 
-
 }

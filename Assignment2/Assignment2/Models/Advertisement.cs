@@ -5,10 +5,7 @@ namespace Assignment2.Models
 {
     public class Advertisement
     {
-        //[Required]
-        //[Display(Name = "Advertisement Id")]
-        //[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        //[DatabaseGenerated(DatabaseGeneratedOption.None)]
+        //No annotations at present as the Entity Framework is handling the details and we don't want another foray into Migration Hell.
         public int Id { get; set; }
 
         [Required]
