@@ -64,6 +64,9 @@ namespace Assignment2.Views
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(IFormFile file, string Id, [Bind("Id,FileName,Url,BrokerageId")] Advertisement advertisement)
         {
+            if (file == null){
+                return View();
+            }
             if(advertisement != null && Id != null)
             {
                 BlobContainerClient containerClient;
