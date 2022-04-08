@@ -207,7 +207,6 @@ namespace Assignment2.Controllers
             {
                bool isSubbed = _context.Subscriptions.ToList().Any(subscription => subscription.BrokerageId.Equals(brokerage.Id) && subscription.ClientId.Equals(id));
                 
-
                 BrokerageSubscriptionsViewModel subscriptionModel = new BrokerageSubscriptionsViewModel
                 {
                     BrokerageId = brokerage.Id, 
@@ -219,7 +218,7 @@ namespace Assignment2.Controllers
                 SubscriptionList.Add(subscriptionModel);
             });
 
-            viewModel.Subscriptions = SubscriptionList;
+            viewModel.Subscriptions = SubscriptionList.OrderBy(s => !s.IsMember).ThenBy(s => s.Title);
 
             return View(viewModel);
         }
