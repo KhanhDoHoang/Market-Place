@@ -65,7 +65,7 @@ namespace Assignment2.Views
         public async Task<IActionResult> Create(IFormFile file, string Id, [Bind("Id,FileName,Url,BrokerageId")] Advertisement advertisement)
         {
             if (file == null){
-                return View();
+                return View("Error");
             }
             if(advertisement != null && Id != null)
             {
