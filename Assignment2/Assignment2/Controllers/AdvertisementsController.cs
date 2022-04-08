@@ -48,7 +48,7 @@ namespace Assignment2.Views
 
 
         // GET: Advertisements/Create
-        public IActionResult Create(string Id, string BrokerageTitle)
+        public IActionResult Create(string Id)
         {
             Brokerage viewModel = _context.Brokerages.Where(b => b.Id==Id).AsNoTracking().FirstOrDefault();
             if (viewModel == null) { return NotFound(); }
