@@ -2,7 +2,6 @@
 
 @{
     ViewData["Title"] = "Delete";
-    var imageUrl = @Model.Url;
 }
 
 <h1>Delete for Brokerage @Html.DisplayFor(modelItem => modelItem.Brokerage.Title)</h1>
@@ -23,7 +22,7 @@
         </dt>
         <dd class = "col-sm-10">
             @*@Html.DisplayFor(model => model.Url)*@
-            <img src="@imageUrl" style="max-width: 400px;"/>
+            <img src="@Model.Url" style="max-width: 400px;"/>
         </dd>
     </dl>
     
@@ -31,6 +30,6 @@
         <input type="hidden" asp-for="Id" />
         <input type="submit" value="Delete" class="btn btn-danger" /> |
         @*<a asp-action="Index">Back to List</a>*@
-        <a asp-action="Index" asp-route-id="@ViewData["BrokerageId"]">Back to List</a>
+        <a asp-action="Index" asp-route-id="@Model.BrokerageId">Back to List</a>
     </form>
 </div>

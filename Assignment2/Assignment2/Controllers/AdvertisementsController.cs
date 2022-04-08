@@ -37,8 +37,6 @@ namespace Assignment2.Views
                                     .ToListAsync()
             };
 
-            ViewData["BrokerageId"] = Id;
-
             if (Id != null)
             {
                 viewModel.Brokerage = _context.Brokerages.Where(a => a.Id.Equals(Id)).Single();
@@ -49,14 +47,11 @@ namespace Assignment2.Views
         }
 
 
-
-
         // GET: Advertisements/Create
         public IActionResult Create(string Id, string BrokerageTitle)
         {
-            ViewData["BrokerageId"] = Id;
-            ViewData["brokerageTitle"] = BrokerageTitle;
-            return View();
+            Brokerage viewModel = _context.Brokerages.Where(b => b.Id==Id).AsNoTracking().Single();
+            return View(viewModel);
         }
 
         // POST: Advertisements/Create
@@ -149,7 +144,6 @@ namespace Assignment2.Views
             {
                 return NotFound();
             }
-            ViewData["BrokerageId"] = advertisement.BrokerageId;
 
             return View(advertisement);
         }
