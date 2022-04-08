@@ -50,7 +50,8 @@ namespace Assignment2.Views
         // GET: Advertisements/Create
         public IActionResult Create(string Id, string BrokerageTitle)
         {
-            Brokerage viewModel = _context.Brokerages.Where(b => b.Id==Id).AsNoTracking().Single();
+            Brokerage viewModel = _context.Brokerages.Where(b => b.Id==Id).AsNoTracking().FirstOrDefault();
+            if (viewModel == null) { return NotFound(); }
             return View(viewModel);
         }
 
@@ -186,7 +187,6 @@ namespace Assignment2.Views
                     return View("Error");
                 }
             }
-
 
             //Remove from database
             if (advertisement != null)
