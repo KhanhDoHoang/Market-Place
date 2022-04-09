@@ -218,7 +218,7 @@ namespace Assignment2.Controllers
                 SubscriptionList.Add(subscriptionModel);
             });
 
-            viewModel.Subscriptions = SubscriptionList.OrderBy(s => !s.IsMember).ThenBy(s => s.Title);
+            viewModel.Subscriptions = SubscriptionList.OrderBy(s => s.IsMember).ThenBy(s => s.Title);
 
             return View(viewModel);
         }
