@@ -58,7 +58,7 @@ namespace Assignment2.Views
         // POST: Advertisements/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(IFormFile file, string Id, [Bind("Id,FileName,Url,BrokerageId")] Advertisement advertisement)
+        public async Task<IActionResult> Create(IFormFile file, string Id, [Bind("FileName,Url,BrokerageId")] Advertisement advertisement)
         {
             if (file == null)
             {
